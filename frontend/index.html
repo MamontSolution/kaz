@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RocketQueen - 1Win Casino</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#6a5acd">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Вход</button>
+                <button class="tab-btn" data-tab="register">Регистрация</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Войти в игру</button>
+            </form>
+
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="input-group">
+                    <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="registerEmail" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="registerPassword" placeholder="Пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Settings Modal -->
+    <div id="adminModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ Настройки администратора</h3>
+                <button id="closeAdminModal" class="btn-close">×</button>
+            </div>
+            <form id="adminSettingsForm">
+                <div class="form-group">
+                    <label>Вероятность краша (0.001-0.1):</label>
+                    <input type="number" id="crashProbability" step="0.001" min="0.001" max="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Минимальный множитель:</label>
+                    <input type="number" id="minMultiplier" step="0.1" min="1.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Максимальный множитель:</label>
+                    <input type="number" id="maxMultiplier" step="0.1" min="2" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Game -->
+    <div id="gameContainer" style="display: none;">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="header-section">
+                <div class="logo-mobile">
+                    <span class="logo-text">🚀 RQ</span>
+                </div>
+                <div class="online-mobile">
+                    <span>👥 <span id="onlineCountMobile">0</span></span>
+                </div>
+            </div>
+
+            <div class="header-section">
+                <div class="user-mobile">
+                    <span id="usernameMobile">Гость</span>
+                    <span id="balanceMobile">💰 0</span>
+                </div>
+                <button id="menuToggle" class="btn-menu">☰</button>
+            </div>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu">
+            <div class="menu-content">
+                <div class="menu-header">
+                    <h3>Меню</h3>
+                    <button id="closeMenu" class="btn-close">×</button>
+                </div>
+                <div class="menu-items">
+                    <button id="adminSettingsBtnMobile" style="display: none;" class="menu-item">
+                        ⚙️ Настройки
+                    </button>
+                    <button id="logoutBtnMobile" class="menu-item">
+                        🚪 Выйти
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Header -->
+        <header class="desktop-header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-text">🚀 RocketQueen</span>
+                </div>
+                <div class="online-count">
+                    <span>👥 Онлайн: </span>
+                    <span id="onlineCount">0</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="user-info">
+                    <span id="username">Гость</span>
+                    <span id="balance">Баланс: 0</span>
+                </div>
+                <div class="header-controls">
+                    <div id="bettingTimer" class="betting-timer" style="display: none;"></div>
+                    <button id="adminSettingsBtn" style="display: none;" class="btn btn-secondary">⚙️ Настройки</button>
+                    <button id="logoutBtn" class="btn btn-danger">🚪 Выйти</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Game Area -->
+            <div class="game-section">
+                <div class="game-card">
+                    <div class="game-header">
+                        <div class="game-title">
+                            <h2>🚀 Игра RocketQueen</h2>
+                            <div class="multiplier-display" id="multiplier">1.00x</div>
+                        </div>
+                        <div id="bettingTimerDesktop" class="betting-timer-desktop" style="display: none;"></div>
+                    </div>
+
+                    <div class="rocket-container">
+                        <div class="rocket" id="rocket">
+                            🚀
+                        </div>
+                        <div class="stars"></div>
+                    </div>
+
+                    <!-- Betting Controls -->
+                    <div class="bet-controls">
+                        <div class="bet-section">
+                            <div class="bet-header">
+                                <h3>💰 Ставка</h3>
+                            </div>
+                            <div class="bet-input-group">
+                                <div class="amount-input">
+                                    <input type="number" id="betAmount" placeholder="Сумма" min="1" max="10000" value="100">
+                                    <div class="quick-bets">
+                                        <button class="quick-bet-btn" data-amount="100">+100</button>
+                                        <button class="quick-bet-btn" data-amount="500">+500</button>
+                                        <button class="quick-bet-btn" data-amount="1000">+1000</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="auto-section">
+                            <div class="auto-header">
+                                <h3>🎯 Авто кэш</h3>
+                            </div>
+                            <div class="auto-input-group">
+                                <div class="auto-cash-input">
+                                    <input type="number" id="targetMultiplier" placeholder="Коэффициент" min="1.1" step="0.1" value="2.0">
+                                    <span class="x-label">x</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="placeBetBtn" class="btn btn-success btn-lg">Ожидание ставок</button>
+                            <button id="cashoutBtn" class="btn btn-warning btn-lg" disabled>💰 Забрать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel (Desktop) -->
+            <div class="right-panel">
+                <!-- Chat -->
+                <div class="chat-card">
+                    <div class="card-header">
+                        <h3>💬 Чат</h3>
+                    </div>
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Сообщение...">
+                        <button id="sendChatBtn" class="btn btn-primary">➤</button>
+                    </div>
+                </div>
+
+                <!-- Live Bets -->
+                <div class="bets-card">
+                    <div class="card-header">
+                        <h3>🔥 Ставки</h3>
+                    </div>
+                    <div id="betsList" class="bets-list"></div>
+                </div>
+
+                <!-- History -->
+                <div class="history-card">
+                    <div class="card-header">
+                        <h3>📊 История</h3>
+                    </div>
+                    <div id="historyList" class="history-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Bottom Panel -->
+        <div class="mobile-bottom-panel">
+            <div class="mobile-tabs">
+                <button class="mobile-tab active" data-tab="chat">
+                    💬
+                </button>
+                <button class="mobile-tab" data-tab="bets">
+                    🔥
+                </button>
+                <button class="mobile-tab" data-tab="history">
+                    📊
+                </button>
+            </div>
+
+            <div class="mobile-tab-content">
+                <div class="mobile-tab-pane active" id="chatTab">
+                    <div class="chat-messages" id="chatMessagesMobile"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInputMobile" placeholder="Сообщение...">
+                        <button id="sendChatBtnMobile" class="btn btn-primary">➤</button>
+                    </div>
+                </div>
+
+                <div class="mobile-tab-pane" id="betsTab">
+                    <div id="betsListMobile" class="bets-list"></div>
+                </div>
+
+                <div class="mobile-tab-pane" id="historyTab">
+                    <div id="historyListMobile" class="history-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

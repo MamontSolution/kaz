@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin_1",
+    "username": "admin",
+    "email": "admin@admin.com",
+    "password": "admin123",
+    "balance": 999000,
+    "isAdmin": true
+  },
+  {
+    "id": "user_1755197198130",
+    "username": "абоба",
+    "email": "gfd@mail.ru",
+    "password": "123",
+    "balance": 1103,
+    "isAdmin": false
+  }
+]
