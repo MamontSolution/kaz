@@ -2,33 +2,29 @@
 
 class AdminPanel {
     constructor() {
-        // Инициализация Socket.IO соединения
         this.socket = io();
         this.user = null;
         this.allUsers = [];
 
-        // Инициализация всех элементов интерфейса
         this.initElements();
-        // Инициализация обработчиков событий
         this.initEventListeners();
-        // Инициализация обработчиков Socket.IO
         this.initSocketListeners();
-        // Проверка авторизации
         this.checkAuth();
     }
 
-    // Инициализация всех DOM элементов
     initElements() {
-        // Навигация
+        // Navigation
         this.adminNavBtns = document.querySelectorAll('.admin-nav-btn');
         this.backToGame = document.getElementById('backToGame');
 
-        // Секции
-        this.usersSection = document.getElementById('usersSection');
-        this.settingsSection = document.getElementById('settingsSection');
-        this.gameControlSection = document.getElementById('gameControlSection');
+        // Sections
+        this.sections = {
+            users: document.getElementById('usersSection'),
+            settings: document.getElementById('settingsSection'),
+            'game-control': document.getElementById('gameControlSection')
+        };
 
-        // Элементы пользователей
+        // Users Elements
         this.usersTableBody = document.getElementById('usersTableBody');
         this.searchUser = document.getElementById('searchUser');
         this.newUsername = document.getElementById('newUsername');
@@ -37,7 +33,7 @@ class AdminPanel {
         this.newBalance = document.getElementById('newBalance');
         this.addUserBtn = document.getElementById('addUserBtn');
 
-        // Элементы настроек
+        // Settings Elements
         this.gameSettingsForm = document.getElementById('gameSettingsForm');
         this.adminCrashProbability = document.getElementById('adminCrashProbability');
         this.adminMinMultiplier = document.getElementById('adminMinMultiplier');
@@ -46,32 +42,29 @@ class AdminPanel {
         this.balanceAmount = document.getElementById('balanceAmount');
         this.updateBalanceBtn = document.getElementById('updateBalanceBtn');
 
-        // Элементы управления игрой
+        // Game Control Elements
         this.forceGameStart = document.getElementById('forceGameStart');
         this.forceGameCrash = document.getElementById('forceGameCrash');
         this.adminMessage = document.getElementById('adminMessage');
         this.sendAdminMessage = document.getElementById('sendAdminMessage');
     }
 
-    // Инициализация обработчиков событий
     initEventListeners() {
-        // Навигация
-        if (this.adminNavBtns) {
-            this.adminNavBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    this.switchSection(e.target.dataset.section);
-                });
+        // Navigation
+        this.adminNavBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchSection(e.target.dataset.section);
             });
-        }
+        });
 
-        // Кнопка возврата к игре
+        // Back to Game
         if (this.backToGame) {
             this.backToGame.addEventListener('click', () => {
                 window.location.href = '/';
             });
         }
 
-        // Пользователи
+        // Users
         if (this.addUserBtn) {
             this.addUserBtn.addEventListener('click', () => this.addUser());
         }
@@ -82,7 +75,7 @@ class AdminPanel {
             });
         }
 
-        // Настройки
+        // Settings
         if (this.gameSettingsForm) {
             this.gameSettingsForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -94,7 +87,7 @@ class AdminPanel {
             this.updateBalanceBtn.addEventListener('click', () => this.updateUserBalance());
         }
 
-        // Управление игрой
+        // Game Control
         if (this.forceGameStart) {
             this.forceGameStart.addEventListener('click', () => this.forceGameStartAction());
         }
@@ -108,15 +101,12 @@ class AdminPanel {
         }
     }
 
-    // Инициализация обработчиков Socket.IO событий
     initSocketListeners() {
-        // Получение всех пользователей
         this.socket.on('allUsers', (users) => {
             this.allUsers = users;
             this.updateUsersTable();
         });
 
-        // Настройки игры
         this.socket.on('gameSettings', (settings) => {
             if (this.adminCrashProbability) {
                 this.adminCrashProbability.value = settings.crashProbability;
@@ -129,50 +119,34 @@ class AdminPanel {
             }
         });
 
-        // Ошибки
         this.socket.on('error', (message) => {
             this.showNotification(message, 'error');
         });
 
-        // Уведомления
         this.socket.on('adminNotification', (data) => {
             this.showNotification(data.message, data.type || 'info');
         });
     }
 
-    // Показ уведомлений
     showNotification(message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.textContent = message;
-
-        // Add to body
         document.body.appendChild(notification);
-
-        // Remove after delay
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        setTimeout(() => { notification.remove(); }, 3000);
     }
 
-    // Переключение секций
     switchSection(section) {
         // Update active nav button
-        if (this.adminNavBtns) {
-            this.adminNavBtns.forEach(btn => btn.classList.remove('active'));
-        }
+        this.adminNavBtns.forEach(btn => btn.classList.remove('active'));
         const activeBtn = document.querySelector(`[data-section="${section}"]`);
         if (activeBtn) {
             activeBtn.classList.add('active');
         }
 
         // Show active section
-        if (this.usersSection) this.usersSection.classList.remove('active');
-        if (this.settingsSection) this.settingsSection.classList.remove('active');
-        if (this.gameControlSection) this.gameControlSection.classList.remove('active');
-
-        const activeSection = document.getElementById(`${section}Section`);
+        Object.values(this.sections).forEach(sec => sec.classList.remove('active'));
+        const activeSection = this.sections[section];
         if (activeSection) {
             activeSection.classList.add('active');
         }
@@ -185,15 +159,12 @@ class AdminPanel {
         }
     }
 
-    // Проверка авторизации
     async checkAuth() {
         const token = localStorage.getItem('token');
         if (token) {
             try {
                 const response = await fetch('/api/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const data = await response.json();
@@ -205,7 +176,6 @@ class AdminPanel {
                         return;
                     }
                     this.socket.emit('authenticate', token);
-                    // Load initial data
                     this.switchSection('users');
                 } else {
                     window.location.href = '/';
@@ -218,12 +188,10 @@ class AdminPanel {
         }
     }
 
-    // Загрузка всех пользователей
     loadAllUsers() {
         this.socket.emit('getAllUsers');
     }
 
-    // Обновление таблицы пользователей
     updateUsersTable(users = this.allUsers) {
         if (!this.usersTableBody) return;
 
@@ -248,7 +216,6 @@ class AdminPanel {
         });
     }
 
-    // Фильтрация пользователей
     filterUsers(searchTerm) {
         const filteredUsers = this.allUsers.filter(user =>
             user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -257,7 +224,6 @@ class AdminPanel {
         this.updateUsersTable(filteredUsers);
     }
 
-    // Добавление пользователя
     async addUser() {
         const username = this.newUsername.value;
         const email = this.newEmail.value;
@@ -283,12 +249,10 @@ class AdminPanel {
 
             if (response.ok) {
                 this.showNotification('Пользователь добавлен', 'success');
-                // Очищаем форму
                 this.newUsername.value = '';
                 this.newEmail.value = '';
                 this.newPassword.value = '';
                 this.newBalance.value = '1000';
-                // Обновляем список пользователей
                 this.loadAllUsers();
             } else {
                 this.showNotification(data.message, 'error');
@@ -298,7 +262,6 @@ class AdminPanel {
         }
     }
 
-    // Редактирование пользователя
     async editUser(userId) {
         const user = this.allUsers.find(u => u.id === userId);
         if (!user) return;
@@ -335,7 +298,6 @@ class AdminPanel {
         }
     }
 
-    // Удаление пользователя
     async deleteUser(userId) {
         if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
             return;
@@ -362,12 +324,10 @@ class AdminPanel {
         }
     }
 
-    // Загрузка настроек игры
     loadGameSettings() {
         this.socket.emit('getGameSettings');
     }
 
-    // Сохранение настроек игры
     async saveGameSettings() {
         const crashProbability = parseFloat(this.adminCrashProbability.value);
         const minMultiplier = parseFloat(this.adminMinMultiplier.value);
@@ -395,7 +355,6 @@ class AdminPanel {
         }
     }
 
-    // Обновление баланса пользователя
     async updateUserBalance() {
         const userId = this.userIdForBalance.value;
         const amount = parseInt(this.balanceAmount.value);
@@ -430,7 +389,6 @@ class AdminPanel {
         }
     }
 
-    // Принудительный запуск игры
     forceGameStartAction() {
         if (confirm('Вы уверены, что хотите начать игру сейчас?')) {
             this.socket.emit('forceGameStart');
@@ -438,7 +396,6 @@ class AdminPanel {
         }
     }
 
-    // Принудительный краш игры
     forceGameCrashAction() {
         if (confirm('Вы уверены, что хотите остановить игру?')) {
             this.socket.emit('forceGameCrash');
@@ -446,7 +403,6 @@ class AdminPanel {
         }
     }
 
-    // Отправка сообщения всем пользователям
     sendAdminMessageAction() {
         const message = this.adminMessage.value.trim();
         if (!message) {
@@ -460,12 +416,9 @@ class AdminPanel {
     }
 }
 
-// Глобальная переменная для доступа к админ панели
 let adminPanel;
 
-// Initialize the admin panel when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Add loading animation
     const loadingStyles = `
         .loading {
             position: fixed;
@@ -505,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         try {
             adminPanel = new AdminPanel();
-            // Remove loading after a delay
             setTimeout(() => {
                 if (loading.parentNode) {
                     loading.parentNode.removeChild(loading);
