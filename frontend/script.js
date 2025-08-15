@@ -10,6 +10,7 @@ class CasinoRocket {
         this.isBettingPhase = false; // Флаг фазы ставок (можно/нельзя делать ставки)
         this.multiplier = 1.00; // Текущий множитель
         this.timeUntilStart = 0; // Время до начала следующей игры
+        this.allUsers = []; // Все пользователи (для админ панели)
 
         // Инициализация всех элементов интерфейса
         this.initElements();
@@ -54,6 +55,10 @@ class CasinoRocket {
         this.targetMultiplier = document.getElementById('targetMultiplier');
         this.placeBetBtn = document.querySelector('#placeBetBtn');
         this.cashoutBtn = document.querySelector('#cashoutBtn');
+
+        // Кнопки пополнения баланса
+        this.rechargeBtn = document.getElementById('rechargeBtn');
+        this.rechargeBtnMobile = document.getElementById('rechargeBtnMobile');
 
         // Элементы для отображения ставок
         this.myBetsList = document.getElementById('myBetsList'); // Мои ставки (десктоп)
@@ -129,6 +134,14 @@ class CasinoRocket {
                 e.preventDefault();
                 this.saveAdminSettings();
             });
+        }
+
+        // Recharge buttons - кнопки пополнения баланса
+        if (this.rechargeBtn) {
+            this.rechargeBtn.addEventListener('click', () => this.rechargeBalance());
+        }
+        if (this.rechargeBtnMobile) {
+            this.rechargeBtnMobile.addEventListener('click', () => this.rechargeBalance());
         }
 
         // Quick bet buttons - обработка быстрых ставок
@@ -749,6 +762,12 @@ class CasinoRocket {
         if (this.adminModal) this.adminModal.style.display = 'none';
     }
 
+    // Пополнение баланса
+    rechargeBalance() {
+        // Перенаправление на страницу пополнения
+        window.location.href = '/payment.html';
+    }
+
     // Сохранение настроек администратора
     async saveAdminSettings() {
         const crashInput = document.getElementById('crashProbability');
@@ -866,10 +885,8 @@ class CasinoRocket {
             }, 100);
         }
 
-        // Clear input
-        if (this.betAmount) {
-            this.betAmount.value = '';
-        }
+        // Не очищаем поле суммы ставки после нажатия (по вашему требованию)
+        // this.betAmount.value = '';
     }
 
     // Забрать выигрыш
@@ -1181,6 +1198,9 @@ class CasinoRocket {
     }
 }
 
+// Глобальная переменная для доступа к приложению
+let gameApp;
+
 // Initialize the game when page loads
 document.addEventListener('DOMContentLoaded', () => {
     // Add loading animation
@@ -1222,7 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
         try {
-            new CasinoRocket();
+            gameApp = new CasinoRocket();
             // Remove loading after a delay
             setTimeout(() => {
                 if (loading.parentNode) {

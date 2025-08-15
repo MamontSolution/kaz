@@ -175,6 +175,121 @@ app.get('/api/admin/settings', (req, res) => {
   res.json(gameSettings);
 });
 
+// Admin Users API
+app.get('/api/admin/users', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  const user = users.find(u => u.id === token);
+
+  if (!user || !user.isAdmin) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  // Return users without passwords
+  const usersWithoutPasswords = users.map(u => ({
+    id: u.id,
+    username: u.username,
+    email: u.email,
+    balance: u.balance,
+    isAdmin: u.isAdmin
+  }));
+
+  res.json(usersWithoutPasswords);
+});
+
+app.post('/api/admin/users', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  const adminUser = users.find(u => u.id === token);
+
+  if (!adminUser || !adminUser.isAdmin) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  const { username, email, password, balance } = req.body;
+
+  const existingUser = users.find(u => u.email === email || u.username === username);
+  if (existingUser) {
+    return res.status(400).json({ message: 'User already exists' });
+  }
+
+  const user = {
+    id: 'user_' + Date.now().toString(),
+    username,
+    email,
+    password,
+    balance: balance || 1000,
+    isAdmin: false
+  };
+
+  users.push(user);
+
+  res.status(201).json({
+    message: 'User created',
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      balance: user.balance,
+      isAdmin: user.isAdmin
+    }
+  });
+});
+
+app.delete('/api/admin/users/:userId', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  const adminUser = users.find(u => u.id === token);
+  const userId = req.params.userId;
+
+  if (!adminUser || !adminUser.isAdmin) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  // Prevent deleting admin users
+  const userToDelete = users.find(u => u.id === userId);
+  if (userToDelete && userToDelete.isAdmin) {
+    return res.status(403).json({ message: 'Cannot delete admin users' });
+  }
+
+  users = users.filter(u => u.id !== userId);
+
+  res.json({ message: 'User deleted' });
+});
+
+app.put('/api/admin/users/:userId/balance', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  const adminUser = users.find(u => u.id === token);
+  const userId = req.params.userId;
+  const { amount } = req.body;
+
+  if (!adminUser || !adminUser.isAdmin) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  user.balance += amount;
+
+  res.json({
+    message: 'Balance updated',
+    balance: user.balance
+  });
+
+  // Notify user about balance update
+  if (user.socketId) {
+    io.to(user.socketId).emit('balanceUpdate', {
+      userId: user.id,
+      balance: user.balance
+    });
+  }
+});
+
+// Serve admin panel
+app.get('/admin.html', (req, res) => {
+  res.sendFile(__dirname + '/../frontend/admin.html');
+});
+
 // Socket.io connections
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -204,6 +319,22 @@ io.on('connection', (socket) => {
     const user = users.find(u => u.id === userId);
     if (user && user.isAdmin) {
       socket.emit('gameSettings', gameSettings);
+    }
+  });
+
+  socket.on('getAllUsers', () => {
+    const userId = socket.userId;
+    const user = users.find(u => u.id === userId);
+    if (user && user.isAdmin) {
+      // Return users without passwords
+      const usersWithoutPasswords = users.map(u => ({
+        id: u.id,
+        username: u.username,
+        email: u.email,
+        balance: u.balance,
+        isAdmin: u.isAdmin
+      }));
+      socket.emit('allUsers', usersWithoutPasswords);
     }
   });
 
@@ -311,6 +442,158 @@ io.on('connection', (socket) => {
       onlineUsers.add(user.id);
       io.emit('onlineCount', onlineUsers.size);
       console.log('User authenticated:', user.username);
+    }
+  });
+
+  // Admin socket events
+  socket.on('forceGameStart', () => {
+    const userId = socket.userId;
+    const user = users.find(u => u.id === userId);
+    if (user && user.isAdmin) {
+      // Принудительный запуск игры
+      if (!gameState.isRunning && !gameState.bettingPhase) {
+        // Начинаем игру немедленно
+        gameState.bettingPhase = false;
+        gameState.isRunning = true;
+        gameState.multiplier = 1.00;
+        gameState.bets = [];
+
+        io.emit('gameStarted', gameState);
+
+        const crashPoint = Math.random() * (gameSettings.maxMultiplier - gameSettings.minMultiplier) + gameSettings.minMultiplier;
+
+        const gameInterval = setInterval(() => {
+          if (!gameState.isRunning) {
+            clearInterval(gameInterval);
+            return;
+          }
+
+          gameState.multiplier += 0.01;
+          io.emit('multiplierUpdate', gameState.multiplier);
+
+          // Проверяем автоматические кэшауты
+          gameState.bets.forEach((bet, index) => {
+            if (!bet.cashedOut && bet.autoCashout && gameState.multiplier >= bet.autoCashout) {
+              const betUser = users.find(u => u.id === bet.userId);
+              if (betUser) {
+                bet.cashedOut = true;
+                bet.cashoutMultiplier = gameState.multiplier;
+
+                const winnings = Math.floor(bet.amount * bet.autoCashout);
+                betUser.balance += winnings;
+
+                io.emit('betCashedOut', {
+                  betId: bet.id,
+                  multiplier: bet.autoCashout,
+                  winnings: winnings,
+                  userId: betUser.id,
+                  username: betUser.username,
+                  auto: true,
+                  targetMultiplier: bet.autoCashout
+                });
+
+                io.emit('balanceUpdate', { userId: betUser.id, balance: betUser.balance });
+                io.emit('updateBets', gameState.bets);
+              }
+            }
+          });
+
+          if (gameState.multiplier >= crashPoint || Math.random() < gameSettings.crashProbability) {
+            gameState.isRunning = false;
+
+            // Все не закэшированные ставки проигрывают
+            gameState.bets.forEach(bet => {
+              if (!bet.cashedOut) {
+                bet.lost = true;
+              }
+            });
+
+            gameState.history.unshift({
+              multiplier: gameState.multiplier,
+              timestamp: new Date()
+            });
+
+            if (gameState.history.length > 50) {
+              gameState.history.pop();
+            }
+
+            io.emit('gameCrashed', gameState.multiplier);
+            io.emit('updateHistory', gameState.history);
+            io.emit('updateBets', gameState.bets);
+
+            clearInterval(gameInterval);
+            setTimeout(startBettingPhase, 3000);
+          }
+        }, 50);
+
+        io.emit('adminNotification', {
+          message: 'Администратор запустил игру!',
+          type: 'info'
+        });
+      }
+    }
+  });
+
+  socket.on('forceGameCrash', () => {
+    const userId = socket.userId;
+    const user = users.find(u => u.id === userId);
+    if (user && user.isAdmin) {
+      // Принудительный краш игры
+      if (gameState.isRunning) {
+        gameState.isRunning = false;
+
+        // Все не закэшированные ставки проигрывают
+        gameState.bets.forEach(bet => {
+          if (!bet.cashedOut) {
+            bet.lost = true;
+          }
+        });
+
+        gameState.history.unshift({
+          multiplier: gameState.multiplier,
+          timestamp: new Date()
+        });
+
+        if (gameState.history.length > 50) {
+          gameState.history.pop();
+        }
+
+        io.emit('gameCrashed', gameState.multiplier);
+        io.emit('updateHistory', gameState.history);
+        io.emit('updateBets', gameState.bets);
+
+        io.emit('adminNotification', {
+          message: 'Администратор остановил игру!',
+          type: 'info'
+        });
+        setTimeout(startBettingPhase, 3000);
+      }
+    }
+  });
+
+  socket.on('sendAdminMessage', (data) => {
+    const userId = socket.userId;
+    const user = users.find(u => u.id === userId);
+    if (user && user.isAdmin) {
+      // Отправка сообщения всем пользователям
+      const message = {
+        id: Date.now(),
+        userId: 'admin',
+        username: '👑 Администратор',
+        message: data.message,
+        timestamp: new Date()
+      };
+
+      chatMessages.push(message);
+      if (chatMessages.length > 100) {
+        chatMessages.shift();
+      }
+
+      io.emit('newMessage', message);
+      io.emit('adminNotification', {
+        message: 'Сообщение отправлено всем пользователям',
+        type: 'success'
+      });
     }
   });
 });
