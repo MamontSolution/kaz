@@ -1,3 +1,5 @@
+//admin.js
+
 class AdminPanel {
     constructor() {
         // Инициализация Socket.IO соединения

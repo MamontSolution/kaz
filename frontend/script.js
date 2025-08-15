@@ -1,3 +1,5 @@
+//script.js
+
 class CasinoRocket {
     constructor() {
         // Инициализация Socket.IO соединения
