@@ -1,35 +1,44 @@
 class CasinoRocket {
     constructor() {
+        // Инициализация Socket.IO соединения
         this.socket = io();
-        this.user = null;
-        this.currentBet = null;
-        this.isGameRunning = false;
-        this.isBettingPhase = false;
-        this.multiplier = 1.00;
-        this.timeUntilStart = 0;
 
+        // Данные пользователя и игры
+        this.user = null; // Текущий авторизованный пользователь
+        this.currentBet = null; // Текущая ставка пользователя
+        this.isGameRunning = false; // Флаг состояния игры (запущена/остановлена)
+        this.isBettingPhase = false; // Флаг фазы ставок (можно/нельзя делать ставки)
+        this.multiplier = 1.00; // Текущий множитель
+        this.timeUntilStart = 0; // Время до начала следующей игры
+
+        // Инициализация всех элементов интерфейса
         this.initElements();
+        // Инициализация обработчиков событий
         this.initEventListeners();
+        // Инициализация обработчиков Socket.IO
         this.initSocketListeners();
+        // Проверка авторизации при загрузке
         this.checkAuth();
+        // Инициализация мобильных функций
         this.initMobileFeatures();
     }
 
+    // Инициализация всех DOM элементов
     initElements() {
-        // Auth elements
+        // Auth elements - элементы аутентификации
         this.authModal = document.getElementById('authModal');
         this.loginForm = document.getElementById('loginForm');
         this.registerForm = document.getElementById('registerForm');
         this.tabBtns = document.querySelectorAll('.tab-btn');
 
-        // Admin elements
+        // Admin elements - элементы администратора
         this.adminModal = document.getElementById('adminModal');
         this.adminSettingsForm = document.getElementById('adminSettingsForm');
         this.adminSettingsBtn = document.getElementById('adminSettingsBtn');
         this.adminSettingsBtnMobile = document.getElementById('adminSettingsBtnMobile');
         this.closeAdminModal = document.getElementById('closeAdminModal');
 
-        // Game elements
+        // Game elements - основные игровые элементы
         this.gameContainer = document.getElementById('gameContainer');
         this.usernameEl = document.getElementById('username');
         this.balanceEl = document.getElementById('balance');
@@ -43,21 +52,27 @@ class CasinoRocket {
         this.multiplierEl = document.getElementById('multiplier');
         this.betAmount = document.getElementById('betAmount');
         this.targetMultiplier = document.getElementById('targetMultiplier');
-        this.placeBetBtn = document.getElementById('placeBetBtn');
-        this.cashoutBtn = document.getElementById('cashoutBtn');
-        this.betsList = document.getElementById('betsList');
-        this.betsListMobile = document.getElementById('betsListMobile');
+        this.placeBetBtn = document.querySelector('#placeBetBtn');
+        this.cashoutBtn = document.querySelector('#cashoutBtn');
+
+        // Элементы для отображения ставок
+        this.myBetsList = document.getElementById('myBetsList'); // Мои ставки (десктоп)
+        this.allBetsList = document.getElementById('allBetsList'); // Все ставки (десктоп)
+        this.myBetsListMobile = document.getElementById('myBetsListMobile'); // Мои ставки (мобильные)
+        this.allBetsListMobile = document.getElementById('allBetsListMobile'); // Все ставки (мобильные)
+        this.betsToggleBtns = document.querySelectorAll('.bets-toggle-btn'); // Кнопки переключения ставок (мобильные)
+
         this.historyList = document.getElementById('historyList');
         this.historyListMobile = document.getElementById('historyListMobile');
 
-        // Quick bet buttons
-        this.quickBetBtns = document.querySelectorAll('.quick-bet-btn');
+        // Quick bet buttons - кнопки быстрых ставок
+        this.quickBetBtns = document.querySelectorAll('.quick-bet-btn-1win');
 
-        // Betting timers
+        // Betting timers - таймеры ставок
         this.bettingTimer = document.getElementById('bettingTimer');
         this.bettingTimerDesktop = document.getElementById('bettingTimerDesktop');
 
-        // Chat elements
+        // Chat elements - элементы чата
         this.chatMessages = document.getElementById('chatMessages');
         this.chatMessagesMobile = document.getElementById('chatMessagesMobile');
         this.chatInput = document.getElementById('chatInput');
@@ -65,7 +80,7 @@ class CasinoRocket {
         this.sendChatBtn = document.getElementById('sendChatBtn');
         this.sendChatBtnMobile = document.getElementById('sendChatBtnMobile');
 
-        // Mobile elements
+        // Mobile elements - мобильные элементы
         this.mobileMenu = document.getElementById('mobileMenu');
         this.menuToggle = document.getElementById('menuToggle');
         this.closeMenu = document.getElementById('closeMenu');
@@ -73,8 +88,9 @@ class CasinoRocket {
         this.mobileTabPanes = document.querySelectorAll('.mobile-tab-pane');
     }
 
+    // Инициализация обработчиков событий
     initEventListeners() {
-        // Auth tabs
+        // Auth tabs - переключение между вкладками входа/регистрации
         if (this.tabBtns) {
             this.tabBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -83,7 +99,7 @@ class CasinoRocket {
             });
         }
 
-        // Auth forms
+        // Auth forms - обработка форм входа и регистрации
         if (this.loginForm) {
             this.loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -98,7 +114,7 @@ class CasinoRocket {
             });
         }
 
-        // Admin settings
+        // Admin settings - обработка настроек администратора
         if (this.adminSettingsBtn) {
             this.adminSettingsBtn.addEventListener('click', () => this.showAdminSettings());
         }
@@ -115,7 +131,7 @@ class CasinoRocket {
             });
         }
 
-        // Quick bet buttons
+        // Quick bet buttons - обработка быстрых ставок
         if (this.quickBetBtns) {
             this.quickBetBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -125,7 +141,7 @@ class CasinoRocket {
             });
         }
 
-        // Game controls
+        // Game controls - игровое управление
         if (this.logoutBtn) {
             this.logoutBtn.addEventListener('click', () => this.logout());
         }
@@ -139,7 +155,7 @@ class CasinoRocket {
             this.cashoutBtn.addEventListener('click', () => this.cashout());
         }
 
-        // Chat
+        // Chat - обработка чата
         if (this.sendChatBtn) {
             this.sendChatBtn.addEventListener('click', () => this.sendMessage());
         }
@@ -161,7 +177,7 @@ class CasinoRocket {
             });
         }
 
-        // Mobile menu
+        // Mobile menu - мобильное меню
         if (this.menuToggle) {
             this.menuToggle.addEventListener('click', () => {
                 if (this.mobileMenu) {
@@ -177,7 +193,16 @@ class CasinoRocket {
             });
         }
 
-        // Mobile tabs
+        // Mobile bets toggle - переключение между своими и всеми ставками на мобильных
+        if (this.betsToggleBtns) {
+            this.betsToggleBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    this.switchBetsView(e.target.dataset.betType);
+                });
+            });
+        }
+
+        // Mobile tabs - мобильные вкладки
         if (this.mobileTabs) {
             this.mobileTabs.forEach(tab => {
                 tab.addEventListener('click', (e) => {
@@ -186,7 +211,7 @@ class CasinoRocket {
             });
         }
 
-        // Close modals when clicking outside
+        // Close modals when clicking outside - закрытие модальных окон по клику вне их
         if (this.authModal) {
             this.authModal.addEventListener('click', (e) => {
                 if (e.target === this.authModal) {
@@ -210,20 +235,21 @@ class CasinoRocket {
         }
     }
 
+    // Инициализация мобильных функций
     initMobileFeatures() {
-        // Handle window resize
+        // Handle window resize - обработка изменения размера окна
         window.addEventListener('resize', () => {
             this.updateLayout();
         });
 
-        // Handle orientation change
+        // Handle orientation change - обработка изменения ориентации
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
                 this.updateLayout();
             }, 100);
         });
 
-        // Prevent zoom on input focus
+        // Prevent zoom on input focus - предотвращение зума при фокусе на input
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
@@ -235,6 +261,7 @@ class CasinoRocket {
         });
     }
 
+    // Обновление лэйаута при изменении размера экрана
     updateLayout() {
         // Update layout based on screen size
         const isMobile = window.innerWidth < 769;
@@ -253,7 +280,9 @@ class CasinoRocket {
         }
     }
 
+    // Инициализация обработчиков Socket.IO событий
     initSocketListeners() {
+        // Получение состояния игры при подключении
         this.socket.on('gameState', (state) => {
             this.isGameRunning = state.isRunning || false;
             this.isBettingPhase = state.bettingPhase || false;
@@ -269,6 +298,7 @@ class CasinoRocket {
             }
         });
 
+        // Начало фазы ставок
         this.socket.on('bettingPhaseStarted', (data) => {
             this.isBettingPhase = true;
             this.isGameRunning = false;
@@ -282,16 +312,19 @@ class CasinoRocket {
                 this.cashoutBtn.disabled = true;
             }
 
+            this.showPrestartRocket();
             this.showBettingTimer();
             this.updatePlaceBetButton();
             this.clearBets();
         });
 
+        // Обратный отсчет до начала игры
         this.socket.on('bettingCountdown', (timeLeft) => {
             this.timeUntilStart = timeLeft;
             this.updateBettingTimer();
         });
 
+        // Начало игры
         this.socket.on('gameStarted', (state) => {
             this.isBettingPhase = false;
             this.isGameRunning = true;
@@ -304,6 +337,7 @@ class CasinoRocket {
             this.updatePlaceBetButton();
         });
 
+        // Обновление множителя во время игры
         this.socket.on('multiplierUpdate', (multiplier) => {
             this.multiplier = multiplier;
             if (this.multiplierEl) {
@@ -322,6 +356,7 @@ class CasinoRocket {
             this.updateBetsDisplay();
         });
 
+        // Игра завершена (краш)
         this.socket.on('gameCrashed', (multiplier) => {
             this.isGameRunning = false;
             this.crashRocket();
@@ -332,22 +367,27 @@ class CasinoRocket {
             this.updatePlaceBetButton();
         });
 
+        // Новая ставка от любого пользователя
         this.socket.on('newBet', (bet) => {
             this.addBetToList(bet);
         });
 
+        // Обновление всех ставок
         this.socket.on('updateBets', (bets) => {
             this.updateBets(bets);
         });
 
+        // Обновление истории игр
         this.socket.on('updateHistory', (history) => {
             this.updateHistory(history);
         });
 
+        // Ставка закэширована
         this.socket.on('betCashedOut', (data) => {
             this.updateBetCashedOut(data);
         });
 
+        // Обновление баланса пользователя
         this.socket.on('balanceUpdate', (data) => {
             if (this.user && this.user.id === data.userId) {
                 this.user.balance = data.balance;
@@ -355,11 +395,12 @@ class CasinoRocket {
             }
         });
 
+        // Ошибки
         this.socket.on('error', (message) => {
             this.showNotification(message, 'error');
         });
 
-        // Chat
+        // Chat - чат функциональность
         this.socket.on('chatHistory', (messages) => {
             this.updateChat(messages);
         });
@@ -368,7 +409,7 @@ class CasinoRocket {
             this.addMessageToChat(message);
         });
 
-        // Online count
+        // Online count - количество онлайн пользователей
         this.socket.on('onlineCount', (count) => {
             if (this.onlineCountEl) {
                 this.onlineCountEl.textContent = count;
@@ -378,7 +419,7 @@ class CasinoRocket {
             }
         });
 
-        // Admin
+        // Admin - админ настройки
         this.socket.on('gameSettings', (settings) => {
             if (document.getElementById('crashProbability')) {
                 document.getElementById('crashProbability').value = settings.crashProbability;
@@ -388,6 +429,7 @@ class CasinoRocket {
         });
     }
 
+    // Показ уведомлений
     showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
@@ -403,6 +445,7 @@ class CasinoRocket {
         }, 3000);
     }
 
+    // Добавление быстрой ставки
     addQuickBet(amount) {
         if (this.betAmount) {
             const currentAmount = parseInt(this.betAmount.value) || 0;
@@ -418,6 +461,7 @@ class CasinoRocket {
         }
     }
 
+    // Показ таймера ставок
     showBettingTimer() {
         const isMobile = window.innerWidth < 769;
 
@@ -435,6 +479,7 @@ class CasinoRocket {
         }
     }
 
+    // Скрытие таймера ставок
     hideBettingTimer() {
         if (this.bettingTimer) {
             this.bettingTimer.style.display = 'none';
@@ -444,9 +489,10 @@ class CasinoRocket {
         }
     }
 
+    // Обновление таймера ставок
     updateBettingTimer() {
         const seconds = Math.ceil(this.timeUntilStart / 1000);
-        const timerText = `Ставки: ${seconds}с`;
+        const timerText = `⏳ ${seconds}с`;
 
         if (this.bettingTimer) {
             this.bettingTimer.textContent = timerText;
@@ -456,6 +502,7 @@ class CasinoRocket {
         }
     }
 
+    // Переключение вкладок аутентификации
     switchTab(tab) {
         if (this.tabBtns) {
             this.tabBtns.forEach(btn => btn.classList.remove('active'));
@@ -474,6 +521,7 @@ class CasinoRocket {
         }
     }
 
+    // Переключение мобильных вкладок
     switchMobileTab(tab) {
         // Update active tab
         if (this.mobileTabs) {
@@ -498,6 +546,29 @@ class CasinoRocket {
         }
     }
 
+    // Переключение между своими и всеми ставками (мобильные)
+    switchBetsView(type) {
+        if (this.betsToggleBtns) {
+            this.betsToggleBtns.forEach(btn => btn.classList.remove('active'));
+        }
+
+        const activeBtn = document.querySelector(`[data-bet-type="${type}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        if (this.myBetsListMobile && this.allBetsListMobile) {
+            if (type === 'my') {
+                this.myBetsListMobile.style.display = 'block';
+                this.allBetsListMobile.style.display = 'none';
+            } else {
+                this.myBetsListMobile.style.display = 'none';
+                this.allBetsListMobile.style.display = 'block';
+            }
+        }
+    }
+
+    // Вход пользователя
     async login() {
         const emailInput = document.getElementById('loginEmail');
         const passwordInput = document.getElementById('loginPassword');
@@ -539,6 +610,7 @@ class CasinoRocket {
         }
     }
 
+    // Регистрация пользователя
     async register() {
         const usernameInput = document.getElementById('registerUsername');
         const emailInput = document.getElementById('registerEmail');
@@ -582,6 +654,7 @@ class CasinoRocket {
         }
     }
 
+    // Проверка авторизации при загрузке страницы
     async checkAuth() {
         const token = localStorage.getItem('token');
         if (token) {
@@ -612,6 +685,7 @@ class CasinoRocket {
         }
     }
 
+    // Показ формы авторизации
     showAuth() {
         if (this.authModal) this.authModal.style.display = 'flex';
         if (this.gameContainer) this.gameContainer.style.display = 'none';
@@ -623,12 +697,14 @@ class CasinoRocket {
         }
     }
 
+    // Показ игрового интерфейса
     showGame() {
         if (this.authModal) this.authModal.style.display = 'none';
         if (this.gameContainer) this.gameContainer.style.display = 'block';
         this.hideAdminSettings();
     }
 
+    // Обновление информации о пользователе
     updateUserInfo() {
         if (this.user) {
             const userInfo = `${this.user.username} | 💰${this.user.balance}`;
@@ -645,6 +721,7 @@ class CasinoRocket {
         }
     }
 
+    // Обновление кнопки администратора
     updateAdminButton() {
         const isAdmin = this.user && this.user.isAdmin;
 
@@ -656,6 +733,7 @@ class CasinoRocket {
         }
     }
 
+    // Показ настроек администратора
     showAdminSettings() {
         if (this.adminModal) this.adminModal.style.display = 'flex';
         this.socket.emit('getGameSettings');
@@ -666,10 +744,12 @@ class CasinoRocket {
         }
     }
 
+    // Скрытие настроек администратора
     hideAdminSettings() {
         if (this.adminModal) this.adminModal.style.display = 'none';
     }
 
+    // Сохранение настроек администратора
     async saveAdminSettings() {
         const crashInput = document.getElementById('crashProbability');
         const minInput = document.getElementById('minMultiplier');
@@ -704,6 +784,7 @@ class CasinoRocket {
         }
     }
 
+    // Выход пользователя
     async logout() {
         localStorage.removeItem('token');
         this.user = null;
@@ -715,24 +796,26 @@ class CasinoRocket {
         }
     }
 
+    // Обновление кнопки ставки
     updatePlaceBetButton() {
         if (!this.placeBetBtn) return;
 
         if (this.isBettingPhase) {
             this.placeBetBtn.disabled = false;
             this.placeBetBtn.textContent = '🚀 Сделать ставку';
-            this.placeBetBtn.className = 'btn btn-success btn-lg';
+            this.placeBetBtn.className = 'place-bet-btn-1win btn-success-1win';
         } else if (this.isGameRunning) {
             this.placeBetBtn.disabled = true;
             this.placeBetBtn.textContent = '🎮 Игра началась';
-            this.placeBetBtn.className = 'btn btn-warning btn-lg';
+            this.placeBetBtn.className = 'place-bet-btn-1win btn-warning-1win';
         } else {
             this.placeBetBtn.disabled = true;
             this.placeBetBtn.textContent = '⏳ Ожидание ставок';
-            this.placeBetBtn.className = 'btn btn-secondary btn-lg';
+            this.placeBetBtn.className = 'place-bet-btn-1win btn-secondary-1win';
         }
     }
 
+    // Размещение ставки
     async placeBet() {
         if (!this.user || !this.isBettingPhase || !this.betAmount) return;
 
@@ -789,6 +872,7 @@ class CasinoRocket {
         }
     }
 
+    // Забрать выигрыш
     cashout() {
         if (!this.currentBet || !this.isGameRunning) return;
 
@@ -813,35 +897,49 @@ class CasinoRocket {
         }
     }
 
+    // Запуск анимации ракеты
     startRocketAnimation() {
         if (this.rocket) {
+            this.rocket.innerHTML = '<img src="https://1play.gamedev-tech.cc/lucky_grm/assets/media/7a702f0aec3a535e1ba54a71c31bdfd1.webp" alt="Rocket">';
             this.rocket.style.bottom = '0';
-            this.rocket.style.transform = 'translateX(-50%)';
             this.rocket.classList.remove('rocket-crash');
+            this.rocket.classList.remove('rocket-prestart');
             this.rocket.style.transition = 'bottom 0.1s linear';
         }
         this.hideBettingTimer();
     }
 
+    // Показ предстартовой ракеты
+    showPrestartRocket() {
+        if (this.rocket) {
+            this.rocket.innerHTML = '<img src="https://1play.gamedev-tech.cc/lucky_grm/assets/media/c544881eb170e73349e4c92d1706a96c.svg" alt="Rocket Ready">';
+            this.rocket.classList.add('rocket-prestart');
+            this.rocket.style.bottom = '0';
+            this.rocket.style.filter = 'drop-shadow(0 0 15px #00ff00)';
+        }
+    }
+
+    // Обновление позиции ракеты
     updateRocketPosition(multiplier) {
         if (this.rocket) {
             const maxHeight = window.innerWidth < 769 ? 200 : 350;
             const position = Math.min(maxHeight * (multiplier / 15), maxHeight);
             this.rocket.style.bottom = position + 'px';
 
+            // Удаляем анимацию при движении
+            this.rocket.style.animation = 'none';
+
             if (multiplier > 5) {
-                this.rocket.style.transform = 'translateX(-50%) scale(1.2)';
                 this.rocket.style.filter = 'drop-shadow(0 0 20px #ff5722)';
             } else if (multiplier > 2) {
-                this.rocket.style.transform = 'translateX(-50%) scale(1.1)';
                 this.rocket.style.filter = 'drop-shadow(0 0 15px #ffeb3b)';
             } else {
-                this.rocket.style.transform = 'translateX(-50%) scale(1)';
                 this.rocket.style.filter = 'drop-shadow(0 0 10px #00ffff)';
             }
         }
     }
 
+    // Анимация краша ракеты
     crashRocket() {
         if (this.rocket) {
             this.rocket.classList.add('rocket-crash');
@@ -851,9 +949,9 @@ class CasinoRocket {
         setTimeout(() => {
             if (this.rocket) {
                 this.rocket.style.bottom = '0';
-                this.rocket.style.transform = 'translateX(-50%)';
                 this.rocket.style.filter = 'none';
                 this.rocket.classList.remove('rocket-crash');
+                this.rocket.classList.add('rocket-prestart');
             }
             if (this.cashoutBtn) {
                 this.cashoutBtn.disabled = true;
@@ -862,23 +960,53 @@ class CasinoRocket {
         }, 1000);
     }
 
+    // Обновление всех ставок
     updateBets(bets) {
-        this.updateBetsList(bets, this.betsList);
-        this.updateBetsList(bets, this.betsListMobile);
+        if (!this.user) return;
+
+        // Разделяем ставки на свои и чужие
+        const myBets = bets.filter(bet => bet.userId === this.user.id);
+        const otherBets = bets.filter(bet => bet.userId !== this.user.id);
+
+        // Обновляем десктопные списки
+        this.updateBetsList(myBets, this.myBetsList);
+        this.updateBetsList(otherBets, this.allBetsList);
+
+        // Обновляем мобильные списки
+        this.updateBetsList(myBets, this.myBetsListMobile);
+        this.updateBetsList(otherBets, this.allBetsListMobile);
     }
 
+    // Обновление списка ставок
     updateBetsList(bets, container) {
-        if (container) {
-            container.innerHTML = '';
-            bets.forEach(bet => this.addBetToContainer(bet, container));
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        // Сортируем ставки: активные сверху, закэшированные и проигравшие внизу
+        const activeBets = bets.filter(bet => !bet.cashedOut && !bet.lost);
+        const finishedBets = bets.filter(bet => bet.cashedOut || bet.lost);
+
+        // Отображаем активные ставки первыми
+        activeBets.forEach(bet => this.addBetToContainer(bet, container));
+
+        // Отображаем завершенные ставки
+        finishedBets.forEach(bet => this.addBetToContainer(bet, container));
+    }
+
+    // Добавление одной ставки в список
+    addBetToList(bet) {
+        // Добавляем в десктопные списки
+        if (this.user && bet.userId === this.user.id) {
+            this.addBetToContainer(bet, this.myBetsList);
+            this.addBetToContainer(bet, this.myBetsListMobile);
+        } else {
+            this.addBetToContainer(bet, this.allBetsList);
+            this.addBetToContainer(bet, this.allBetsListMobile);
         }
     }
 
-    addBetToList(bet) {
-        this.addBetToContainer(bet, this.betsList);
-        this.addBetToContainer(bet, this.betsListMobile);
-    }
-
+    // Добавление ставки в контейнер
     addBetToContainer(bet, container) {
         if (!container) return;
 
@@ -914,11 +1042,16 @@ class CasinoRocket {
         container.appendChild(betItem);
     }
 
+    // Очистка всех списков ставок
     clearBets() {
-        if (this.betsList) this.betsList.innerHTML = '';
-        if (this.betsListMobile) this.betsListMobile.innerHTML = '';
+        // Очищаем все списки ставок
+        if (this.myBetsList) this.myBetsList.innerHTML = '';
+        if (this.allBetsList) this.allBetsList.innerHTML = '';
+        if (this.myBetsListMobile) this.myBetsListMobile.innerHTML = '';
+        if (this.allBetsListMobile) this.allBetsListMobile.innerHTML = '';
     }
 
+    // Обновление отображения ставок во время игры
     updateBetsDisplay() {
         if (!this.isGameRunning) return;
 
@@ -929,6 +1062,7 @@ class CasinoRocket {
         });
     }
 
+    // Обновление информации о закэшированной ставке
     updateBetCashedOut(data) {
         // Обновляем UI для закэшированной ставки
         if (data.auto && data.targetMultiplier) {
@@ -936,11 +1070,13 @@ class CasinoRocket {
         }
     }
 
+    // Обновление истории игр
     updateHistory(history) {
         this.updateHistoryList(history, this.historyList);
         this.updateHistoryList(history, this.historyListMobile);
     }
 
+    // Обновление списка истории
     updateHistoryList(history, container) {
         if (!container) return;
 
@@ -963,12 +1099,13 @@ class CasinoRocket {
         });
     }
 
-    // Chat methods
+    // Обновление чата
     updateChat(messages) {
         this.updateChatMessages(messages, this.chatMessages);
         this.updateChatMessages(messages, this.chatMessagesMobile);
     }
 
+    // Обновление сообщений в чате
     updateChatMessages(messages, container) {
         if (!container) return;
 
@@ -977,6 +1114,7 @@ class CasinoRocket {
         container.scrollTop = container.scrollHeight;
     }
 
+    // Добавление сообщения в чат
     addMessageToChat(message) {
         this.addMessageToContainer(message, this.chatMessages);
         this.addMessageToContainer(message, this.chatMessagesMobile);
@@ -984,6 +1122,7 @@ class CasinoRocket {
         this.scrollToBottom(this.chatMessagesMobile);
     }
 
+    // Добавление сообщения в контейнер
     addMessageToContainer(message, container) {
         if (!container) return;
 
@@ -1005,12 +1144,14 @@ class CasinoRocket {
         container.appendChild(messageDiv);
     }
 
+    // Прокрутка чата вниз
     scrollToBottom(container) {
         if (container) {
             container.scrollTop = container.scrollHeight;
         }
     }
 
+    // Отправка сообщения в чат
     sendMessage() {
         const input = document.activeElement.closest('.chat-input')?.querySelector('input');
         if (!input || !this.user) return;
@@ -1026,7 +1167,7 @@ class CasinoRocket {
         input.value = '';
     }
 
-    // Helper function to prevent XSS
+    // Защита от XSS атак
     escapeHtml(text) {
         if (!text) return '';
         const map = {

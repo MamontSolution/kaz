@@ -142,52 +142,88 @@
                     <div class="game-header">
                         <div class="game-title">
                             <h2>🚀 Игра RocketQueen</h2>
-                            <div class="multiplier-display" id="multiplier">1.00x</div>
                         </div>
                         <div id="bettingTimerDesktop" class="betting-timer-desktop" style="display: none;"></div>
                     </div>
 
                     <div class="rocket-container">
                         <div class="rocket" id="rocket">
-                            🚀
+                            <img src="https://1play.gamedev-tech.cc/lucky_grm/assets/media/c544881eb170e73349e4c92d1706a96c.svg" alt="Rocket Ready">
                         </div>
                         <div class="stars"></div>
                     </div>
 
-                    <!-- Betting Controls -->
-                    <div class="bet-controls">
-                        <div class="bet-section">
-                            <div class="bet-header">
-                                <h3>💰 Ставка</h3>
+                    <!-- Betting Controls (стиль 1win) -->
+                    <div class="bet-controls-1win">
+                        <div class="bet-auto-container">
+                            <!-- Bet Amount Section -->
+                            <div class="bet-section-1win">
+                                <div class="bet-header-1win">
+                                    💰 Ставка
+                                </div>
+                                <div class="bet-input-wrapper">
+                                    <input type="number" id="betAmount" class="bet-input-1win" placeholder="Сумма" min="1" max="10000" value="100">
+                                    <span class="currency-label">$</span>
+                                </div>
+                                <div class="quick-bets-1win">
+                                    <button class="quick-bet-btn-1win" data-amount="5">+5</button>
+                                    <button class="quick-bet-btn-1win" data-amount="25">+25</button>
+                                    <button class="quick-bet-btn-1win" data-amount="50">+50</button>
+                                    <button class="quick-bet-btn-1win" data-amount="100">+100</button>
+                                </div>
                             </div>
-                            <div class="bet-input-group">
-                                <div class="amount-input">
-                                    <input type="number" id="betAmount" placeholder="Сумма" min="1" max="10000" value="100">
-                                    <div class="quick-bets">
-                                        <button class="quick-bet-btn" data-amount="100">+100</button>
-                                        <button class="quick-bet-btn" data-amount="500">+500</button>
-                                        <button class="quick-bet-btn" data-amount="1000">+1000</button>
-                                    </div>
+
+                            <!-- Auto Cash Section -->
+                            <div class="auto-section-1win">
+                                <div class="auto-header-1win">
+                                    🎯 Авто кэш
+                                </div>
+                                <div class="bet-input-wrapper">
+                                    <input type="number" id="targetMultiplier" class="bet-input-1win" placeholder="Коэффициент" min="1.1" step="0.1" value="2.0">
+                                    <span class="currency-label">x</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="auto-section">
-                            <div class="auto-header">
-                                <h3>🎯 Авто кэш</h3>
-                            </div>
-                            <div class="auto-input-group">
-                                <div class="auto-cash-input">
-                                    <input type="number" id="targetMultiplier" placeholder="Коэффициент" min="1.1" step="0.1" value="2.0">
-                                    <span class="x-label">x</span>
-                                </div>
-                            </div>
-                        </div>
-
+                        <!-- Action Buttons -->
                         <div class="action-buttons">
-                            <button id="placeBetBtn" class="btn btn-success btn-lg">Ожидание ставок</button>
-                            <button id="cashoutBtn" class="btn btn-warning btn-lg" disabled>💰 Забрать</button>
+                            <button id="placeBetBtn" class="place-bet-btn-1win btn-success-1win">Ожидание ставок</button>
+                            <button id="cashoutBtn" class="place-bet-btn-1win btn-warning-1win" disabled>💰 Забрать</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Sections (только для мобильных устройств) -->
+                <div class="mobile-only-sections">
+                    <!-- Mobile Bets Section -->
+                    <div class="mobile-bets-section">
+                        <div class="mobile-bets-header">
+                            <span>🔥 Ставки</span>
+                            <div class="bets-toggle">
+                                <button class="bets-toggle-btn active" data-bet-type="my">Мои</button>
+                                <button class="bets-toggle-btn" data-bet-type="all">Все</button>
+                            </div>
+                        </div>
+                        <div class="mobile-bets-content">
+                            <div id="myBetsListMobile" class="bets-list"></div>
+                            <div id="allBetsListMobile" class="bets-list" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Chat Section -->
+                    <div class="mobile-section">
+                        <div class="mobile-section-header">💬 Чат</div>
+                        <div class="chat-messages" id="chatMessagesMobile"></div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInputMobile" placeholder="Сообщение...">
+                            <button id="sendChatBtnMobile" class="btn btn-primary">➤</button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile History Section -->
+                    <div class="mobile-section">
+                        <div class="mobile-section-header">📊 История</div>
+                        <div id="historyListMobile" class="history-list"></div>
                     </div>
                 </div>
             </div>
@@ -195,7 +231,7 @@
             <!-- Right Panel (Desktop) -->
             <div class="right-panel">
                 <!-- Chat -->
-                <div class="chat-card">
+                <div class="card chat-card">
                     <div class="card-header">
                         <h3>💬 Чат</h3>
                     </div>
@@ -206,53 +242,28 @@
                     </div>
                 </div>
 
-                <!-- Live Bets -->
-                <div class="bets-card">
+                <!-- Your Bets -->
+                <div class="card bets-card">
                     <div class="card-header">
-                        <h3>🔥 Ставки</h3>
+                        <h3>🎯 Мои ставки</h3>
                     </div>
-                    <div id="betsList" class="bets-list"></div>
+                    <div id="myBetsList" class="bets-list"></div>
+                </div>
+
+                <!-- All Bets -->
+                <div class="card bets-card">
+                    <div class="card-header">
+                        <h3>🔥 Ставки игроков</h3>
+                    </div>
+                    <div id="allBetsList" class="bets-list"></div>
                 </div>
 
                 <!-- History -->
-                <div class="history-card">
+                <div class="card history-card">
                     <div class="card-header">
                         <h3>📊 История</h3>
                     </div>
                     <div id="historyList" class="history-list"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Bottom Panel -->
-        <div class="mobile-bottom-panel">
-            <div class="mobile-tabs">
-                <button class="mobile-tab active" data-tab="chat">
-                    💬
-                </button>
-                <button class="mobile-tab" data-tab="bets">
-                    🔥
-                </button>
-                <button class="mobile-tab" data-tab="history">
-                    📊
-                </button>
-            </div>
-
-            <div class="mobile-tab-content">
-                <div class="mobile-tab-pane active" id="chatTab">
-                    <div class="chat-messages" id="chatMessagesMobile"></div>
-                    <div class="chat-input">
-                        <input type="text" id="chatInputMobile" placeholder="Сообщение...">
-                        <button id="sendChatBtnMobile" class="btn btn-primary">➤</button>
-                    </div>
-                </div>
-
-                <div class="mobile-tab-pane" id="betsTab">
-                    <div id="betsListMobile" class="bets-list"></div>
-                </div>
-
-                <div class="mobile-tab-pane" id="historyTab">
-                    <div id="historyListMobile" class="history-list"></div>
                 </div>
             </div>
         </div>
