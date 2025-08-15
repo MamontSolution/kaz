@@ -71,7 +71,11 @@ body {
     position: relative;
 }
 
-.input-group input {
+.input-group input,
+.form-group input,
+.chat-input input,
+.form-group-full input,
+.form-group-full select {
     width: 100%;
     padding: 15px;
     background: rgba(0, 0, 0, 0.3);
@@ -82,7 +86,11 @@ body {
     outline: none;
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.form-group input:focus,
+.chat-input input:focus,
+.form-group-full input:focus,
+.form-group-full select:focus {
     border-color: #6a5acd;
     box-shadow: 0 0 0 2px rgba(106, 90, 205, 0.3);
 }
@@ -167,26 +175,12 @@ body {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.form-group label,
+.form-group-full label {
     display: block;
     margin-bottom: 8px;
     color: #948AC5;
     font-weight: 500;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-}
-
-.form-group input:focus {
-    border-color: #6a5acd;
-    outline: none;
 }
 
 .form-buttons {
@@ -216,7 +210,8 @@ body {
     margin-bottom: 0;
 }
 
-.logo-mobile .logo-text {
+.logo-mobile .logo-text,
+.logo .logo-text {
     font-size: 20px;
     font-weight: bold;
     background: linear-gradient(135deg, #6a5acd, #4a3aaa);
@@ -224,24 +219,28 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-.online-mobile {
+.online-mobile,
+.online-count {
     font-size: 14px;
     color: #948AC5;
 }
 
-.user-mobile {
+.user-mobile,
+.user-info {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     font-size: 12px;
 }
 
-.user-mobile span:first-child {
+.user-mobile span:first-child,
+.user-info span:first-child {
     font-weight: 600;
     color: #6a5acd;
 }
 
-.user-mobile span:last-child {
+.user-mobile span:last-child,
+.user-info span:last-child {
     color: #948AC5;
 }
 
@@ -331,42 +330,10 @@ body {
     gap: 30px;
 }
 
-.logo .logo-text {
-    font-size: 24px;
-    font-weight: bold;
-    background: linear-gradient(135deg, #6a5acd, #4a3aaa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.online-count {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #948AC5;
-    font-size: 14px;
-}
-
 .header-right {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    text-align: right;
-}
-
-.user-info span:first-child {
-    font-weight: 600;
-    color: #6a5acd;
-}
-
-.user-info span:last-child {
-    color: #948AC5;
-    font-size: 14px;
 }
 
 .header-controls {
@@ -375,7 +342,8 @@ body {
     gap: 15px;
 }
 
-.betting-timer {
+.betting-timer,
+.betting-timer-desktop {
     background: rgba(255, 118, 117, 0.2);
     color: #ff7675;
     padding: 8px 15px;
@@ -442,16 +410,6 @@ body {
     to {
         text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff;
     }
-}
-
-.betting-timer-desktop {
-    background: rgba(255, 118, 117, 0.2);
-    color: #ff7675;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 14px;
-    border: 1px solid rgba(255, 118, 117, 0.3);
 }
 
 /* Контейнер ракеты */
@@ -528,33 +486,37 @@ body {
     to { background-position: 0 100px; }
 }
 
-/* Контролы ставок (стиль 1win) */
-.bet-controls-1win {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.bet-auto-container {
-    display: flex;
-    gap: 20px;
-}
-
-.bet-section-1win, .auto-section-1win {
-    flex: 1;
+/* Объединенный контейнер ставок (стиль 1win) */
+.bet-container-1win,
+.bet-section-1win,
+.auto-section-1win {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
     padding: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
 }
 
-.bet-header-1win, .auto-header-1win {
+.bet-header-1win,
+.auto-header-1win {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
     color: #948AC5;
     font-size: 16px;
     font-weight: 600;
+}
+
+.bet-controls-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.bet-control-group,
+.bet-section-1win,
+.auto-section-1win {
+    flex: 1;
 }
 
 .bet-input-wrapper {
@@ -674,7 +636,12 @@ body {
     gap: 20px;
 }
 
-.card {
+.card,
+.chat-card,
+.bets-card,
+.history-card,
+.mobile-section,
+.mobile-bets-section {
     background: linear-gradient(135deg, #1a1a2e, #16213e);
     border-radius: 15px;
     padding: 20px;
@@ -682,7 +649,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-header {
+.card-header,
+.mobile-bets-header,
+.mobile-section-header {
     margin-bottom: 15px;
     color: #948AC5;
     font-size: 18px;
@@ -699,12 +668,6 @@ body {
     font-size: 16px;
     cursor: pointer;
     padding: 5px;
-}
-
-.chat-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
 }
 
 .chat-messages {
@@ -741,22 +704,8 @@ body {
     gap: 10px;
 }
 
-.chat-input input {
-    flex: 1;
-    padding: 12px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    outline: none;
-}
-
-.chat-input input:focus {
-    border-color: #6a5acd;
-}
-
-.chat-input button {
+.chat-input button,
+.btn-admin {
     padding: 12px 20px;
     background: linear-gradient(135deg, #6a5acd, #4a3aaa);
     color: white;
@@ -766,17 +715,14 @@ body {
     transition: all 0.3s;
 }
 
-.chat-input button:hover {
+.chat-input button:hover,
+.btn-admin:hover {
     transform: translateY(-2px);
 }
 
-.bets-card, .history-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.bets-list, .history-list {
+.bets-list,
+.history-list,
+.mobile-bets-content {
     flex: 1;
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.2);
@@ -869,24 +815,6 @@ body {
 }
 
 /* Мобильные ставки */
-.mobile-bets-section {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mobile-bets-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    color: #948AC5;
-    font-size: 18px;
-    font-weight: 600;
-}
-
 .bets-toggle {
     display: flex;
     background: rgba(0, 0, 0, 0.3);
@@ -907,30 +835,6 @@ body {
 .bets-toggle-btn.active {
     background: rgba(106, 90, 205, 0.3);
     color: white;
-}
-
-.mobile-bets-content {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    padding: 15px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-/* Мобильные секции */
-.mobile-section {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mobile-section-header {
-    margin-bottom: 15px;
-    color: #948AC5;
-    font-size: 18px;
-    font-weight: 600;
 }
 
 /* Скрытие мобильных секций на десктопе */
@@ -975,13 +879,15 @@ body {
         display: none;
     }
 
-    .bet-auto-container {
+    .bet-controls-row {
         flex-direction: column;
         gap: 15px;
     }
 
-    .bet-section-1win, .auto-section-1win {
-        padding: 15px;
+    .bet-control-group,
+    .bet-section-1win,
+    .auto-section-1win {
+        width: 100%;
     }
 
     .quick-bets-1win {
@@ -1040,6 +946,48 @@ body {
     .mobile-only-sections {
         display: block;
     }
+
+    .admin-panel {
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .admin-header h1 {
+        font-size: 24px;
+    }
+
+    .admin-nav {
+        flex-wrap: wrap;
+    }
+
+    .admin-nav-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .users-table {
+        font-size: 12px;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 8px 5px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1048,7 +996,8 @@ body {
         padding: 15px;
     }
 
-    .bet-header-1win, .auto-header-1win {
+    .bet-header-1win,
+    .auto-header-1win {
         font-size: 14px;
     }
 
@@ -1300,45 +1249,6 @@ body {
     min-width: 200px;
 }
 
-.form-group-full label {
-    display: block;
-    margin-bottom: 8px;
-    color: #948AC5;
-    font-weight: 500;
-}
-
-.form-group-full input,
-.form-group-full select {
-    width: 100%;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-}
-
-.form-group-full input:focus,
-.form-group-full select:focus {
-    border-color: #6a5acd;
-    outline: none;
-}
-
-.btn-admin {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: linear-gradient(135deg, #6a5acd, #4a3aaa);
-    color: white;
-}
-
-.btn-admin:hover {
-    transform: translateY(-2px);
-}
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1363,161 +1273,4 @@ body {
 .stat-label {
     color: #948AC5;
     font-size: 14px;
-}
-
-/* Адаптивность для админ панели */
-@media (max-width: 768px) {
-    .admin-panel {
-        margin: 15px;
-        padding: 20px;
-    }
-
-    .admin-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .admin-header h1 {
-        font-size: 24px;
-    }
-
-    .admin-nav {
-        flex-wrap: wrap;
-    }
-
-    .admin-nav-btn {
-        padding: 10px 15px;
-        font-size: 14px;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .users-table {
-        font-size: 12px;
-    }
-
-    .users-table th,
-    .users-table td {
-        padding: 8px 5px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Добавляем новые стили для объединенного контейнера ставок */
-
-/* Объединенный контейнер ставок (стиль 1win) */
-.bet-container-1win {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
-}
-
-.bet-header-1win {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    color: #948AC5;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.bet-controls-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.bet-control-group {
-    flex: 1;
-}
-
-.bet-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.bet-input-1win {
-    width: 100%;
-    padding: 15px 45px 15px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.bet-input-1win:focus {
-    border-color: #6a5acd;
-    box-shadow: 0 0 0 2px rgba(106, 90, 205, 0.3);
-}
-
-.currency-label {
-    position: absolute;
-    right: 15px;
-    color: #948AC5;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.quick-bets-1win {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.quick-bet-btn-1win {
-    background: rgba(106, 90, 205, 0.2);
-    border: 1px solid rgba(106, 90, 205, 0.3);
-    color: #948AC5;
-    padding: 8px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex: 1;
-    min-width: 60px;
-}
-
-.quick-bet-btn-1win:hover {
-    background: rgba(106, 90, 205, 0.4);
-    border-color: #6a5acd;
-    transform: translateY(-2px);
-}
-
-/* Адаптивность для объединенного контейнера */
-@media (max-width: 768px) {
-    .bet-controls-row {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .bet-control-group {
-        width: 100%;
-    }
-
-    .bet-input-1win {
-        padding: 12px 40px 12px 12px;
-        font-size: 14px;
-    }
-
-    .quick-bet-btn-1win {
-        padding: 6px 10px;
-        font-size: 12px;
-    }
-
-    .bet-container-1win {
-        padding: 15px;
-    }
 }
