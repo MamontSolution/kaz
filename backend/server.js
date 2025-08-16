@@ -1,5 +1,3 @@
-//server.js
-
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -524,7 +522,7 @@ io.on('connection', (socket) => {
             io.emit('updateBets', gameState.bets);
 
             clearInterval(gameInterval);
-            setTimeout(startBettingPhase, 3000);
+            setTimeout(startBettingPhase, 7000); // Изменено на 7 секунд
           }
         }, 50);
 
@@ -568,7 +566,7 @@ io.on('connection', (socket) => {
           message: 'Администратор остановил игру!',
           type: 'info'
         });
-        setTimeout(startBettingPhase, 3000);
+        setTimeout(startBettingPhase, 7000); // Изменено на 7 секунд
       }
     }
   });
@@ -606,7 +604,7 @@ function startBettingPhase() {
   gameState.bets = [];
 
   io.emit('bettingPhaseStarted', {
-    timeUntilStart: 10000
+    timeUntilStart: 10000 // Оставляем 10 секунд для фазы ставок
   });
 
   let timeLeft = 10000;
@@ -673,7 +671,7 @@ function startGame() {
       io.emit('updateBets', gameState.bets);
 
       clearInterval(gameInterval);
-      setTimeout(startBettingPhase, 3000);
+      setTimeout(startBettingPhase, 7000); // Изменено на 7 секунд
     }
   }, 50);
 }

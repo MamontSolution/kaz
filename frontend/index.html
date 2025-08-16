@@ -84,7 +84,7 @@
             <div class="header-section">
                 <div class="user-mobile">
                     <span id="usernameMobile">Гость</span>
-                    <span id="balanceMobile">💰 0</span>
+                    <span id="balanceMobile">💎 0</span>
                 </div>
 
 
@@ -104,11 +104,8 @@
                     <button id="adminSettingsBtnMobile" style="display: none;" class="menu-item">
                         ⚙️ Настройки
                     </button>
-                    <button id="adminPanelBtnMobile" style="display: none;" class="menu-item">
-                        👑 Админ панель
-                    </button>
                     <button id="logoutBtnMobile" class="menu-item">
-                        🚪 Выйти
+                        Выйти
                     </button>
                 </div>
             </div>
@@ -131,11 +128,10 @@
                 <div class="header-controls">
                     <span id="username">Гость</span>
  <span id="balance">Баланс: 0</span>
-                    <button id="rechargeBtn" class="btn-recharge">Пополнить</button>
+                    <button id="rechargeBtn" class="btn btn-dep">Пополнить</button>
 
-                    <button id="adminSettingsBtn" style="display: none;" class="btn btn-secondary">⚙️ Настройки</button>
-                    <button id="adminPanelBtn" style="display: none;" class="btn btn-warning" onclick="window.location.href='/admin.html'">👑 Админ панель</button>
-                    <button id="logoutBtn" class="btn btn-danger">🚪 Выйти</button>
+                    <button id="adminSettingsBtn" style="display: none;" class="btn btn-dep" onclick="window.location.href='/admin.html'">⚙️ Настройки</button>
+                    <button id="logoutBtn" class="btn btn-danger">Выйти</button>
                 </div>
             </div>
         </header>
@@ -150,8 +146,10 @@
                     </div>
 
                     <div class="rocket-container">
+                        <!-- НОВЫЙ ЭЛЕМЕНТ ДЛЯ ОТОБРАЖЕНИЯ СОСТОЯНИЯ ИГРЫ -->
+                        <div id="gameStatus" class="game-status" style="display: none;"></div>
                         <div class="rocket" id="rocket">
-                            <img src="https://1play.gamedev-tech.cc/lucky_grm/assets/media/c544881eb170e73349e4c92d1706a96c.svg" alt="Rocket Ready">
+                            <img src="https://1play.gamedev-tech.cc/lucky_grm/assets/media/c544881eb170e73349e4c92d1706a96c.svg  " alt="Rocket Ready">
                         </div>
                         <div class="stars"></div>
                     </div>

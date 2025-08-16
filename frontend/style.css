@@ -134,9 +134,18 @@ body {
     color: white;
 }
 
-.btn-secondary {
-    background: linear-gradient(135deg, #636e72, #2d3436);
+#username {
+    font-weight: bold;
+    color: #948AC5; /* Цвет из вашего проекта */
+    font-size: 1em;
+    /* Стили для самой иконки можно дополнительно настроить через span или отдельный элемент */
+}
+
+/* Кнопка пополнения баланса */
+.btn-dep {
+    background: linear-gradient(135deg, #00b894, #00a085);
     color: white;
+    box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
 }
 
 .btn-lg {
@@ -616,10 +625,6 @@ body {
     box-shadow: 0 8px 20px rgba(253, 203, 110, 0.4);
 }
 
-.btn-secondary-1win {
-    background: linear-gradient(135deg, #636e72, #2d3436);
-    color: white;
-}
 
 .btn-disabled-1win {
     opacity: 0.5;
@@ -719,6 +724,61 @@ body {
 .btn-admin:hover {
     transform: translateY(-2px);
 }
+
+
+
+/* Добавляем стили для нового элемента gameStatus */
+.game-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.game-status-text {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.game-status-timer {
+    font-size: 20px;
+    color: #ffeb3b;
+}
+
+.game-status-multiplier {
+    font-size: 32px;
+    color: #00ffff;
+    animation: glow 2s infinite alternate;
+}
+
+.game-status-crash {
+    font-size: 32px;
+    color: #ff5722;
+    animation: crashGlow 1s infinite;
+}
+
+.crash-text {
+    font-size: 24px;
+    display: block;
+    margin-top: 10px;
+    color: #fff;
+}
+
+@keyframes crashGlow {
+    0% { text-shadow: 0 0 5px #ff5722; }
+    50% { text-shadow: 0 0 20px #ff5722, 0 0 30px #ff5722; }
+    100% { text-shadow: 0 0 5px #ff5722; }
+}
+
+/* Остальные стили остаются без изменений */
+/* ... (все остальные стили из оригинального файла) ... */
+
 
 .bets-list,
 .history-list,
@@ -1100,19 +1160,7 @@ body {
 
 /* Добавляем новые стили для кнопки пополнения и админ панели */
 
-/* Кнопка пополнения баланса */
-.btn-recharge {
-    background: linear-gradient(135deg, #ff9ff3, #f368e0);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: all 0.3s;
-}
+
 
 .btn-recharge:hover {
     transform: translateY(-2px);
